@@ -24,7 +24,7 @@ This mini-project is my implementation of a secure HTTP based client server appl
 
 - Server sends appropriate HTTP response messages as manually verified by a chrome extension:
 
-![alt text](readme_1.jpg "readme_1")
+![alt text](https://github.com/faizanzafar40/Mini-Project-Image-Steganography-using-a-Custom-Web-server/blob/master/readme_1.JPG "readme_1")
 
 - Server is able to encode any text file (from the 10 available) into an image (randomly chosen from the 5 24-bit PNGs available)
 - Server is able to serve the client with the encoded image
@@ -50,7 +50,7 @@ are: Socket, Sys, RE, OS, Random, Binascii & Pillow
 
 - Since the client requests a txt file, the browser assumes that the response will be a txt file. Now the response from our server does contain “Content-type: Image/PNG” to tell the browser of correct MIME type. But still the earlier assumption causes a problem when the client tries to save the encoded image:
 
-![alt text](readme_2.jpg "readme_2")
+![alt text](https://github.com/faizanzafar40/Mini-Project-Image-Steganography-using-a-Custom-Web-server/blob/master/readme_2.JPG "readme_2")
 
 - As it can be seen, the client must manually specify the file type every time he tries to save the encoded image. This is bad from a usability point of view.
 
