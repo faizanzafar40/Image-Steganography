@@ -2,7 +2,7 @@
 
 ## Brief Description
 
-This mini-project is my implementation of a secure HTTP based client server application which seamlessly works on encoding and decoding text files in images. This project is written in Python 3.5.
+This mini-project is my implementation of a secure HTTP based client server application which seamlessly works on encoding and decoding text files in images. The project is written in Python 3.5.
 
 
 ## Instructions for Encoding
