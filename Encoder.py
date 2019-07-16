@@ -6,29 +6,29 @@ from HelperFunctions import *
 
 def myEncoder(fileName,number):
     with open(fileName, "r") as myfile:
-        data=myfile.read()
+        data = myfile.read()
 
     testBin = return_binary(data) + '10000000000000000000000000000000000000000'
     binLength = len(testBin)
 
-    #open image
+    # open image
     image = Image.open(str(random.randrange(1, 6)) + '.png')
 
-    #store size
+    # store size
     length,height = image.size
 
-    #split into three bands
+    # split into three bands
     imageLoaded = image.load()
 
-    #start encoding from the first bit
+    # start encoding from the first bit
     index = 0
 
-    #loop over all pixel values
+    # loop over all pixel values
     for x in range(0,height-1):
         for y in range(0,length-1):
 
             r,g,b = imageLoaded[y,x]
-            #encoding in RED
+            # encoding in RED
             if index < binLength:
                 if testBin[index] == '0':
                     r = clear_last_bit(r)
@@ -38,7 +38,7 @@ def myEncoder(fileName,number):
             else:
                 break
 
-            #encoding in GREEN
+            # encoding in GREEN
             if index < binLength:
                 if testBin[index] == '0':
                     g = clear_last_bit(g)
@@ -48,7 +48,7 @@ def myEncoder(fileName,number):
             else:
                 break
 
-            #encoding in BLUE
+            # encoding in BLUE
             if index < binLength:
                 if testBin[index] == '0':
                     b = clear_last_bit(b)
@@ -60,5 +60,5 @@ def myEncoder(fileName,number):
 
             imageLoaded[y,x] = (r, g, b)
 
-    #Saving the image
+    # Saving the image
     image.save(number + 'modified.png', 'PNG')
