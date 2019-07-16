@@ -22,7 +22,10 @@ This mini-project is my implementation of a secure HTTP based client server appl
 
 ## Project Status
 
-- Server sends appropriate HTTP response messages
+- Server sends appropriate HTTP response messages as manually verified by a chrome extension:
+
+![alt text](readme_1.jpg "readme_1")
+
 - Server is able to encode any text file (from the 10 available) into an image (randomly chosen from the 5 24-bit PNGs available)
 - Server is able to serve the client with the encoded image
 - Client is able to open the image into any image editing software
@@ -47,7 +50,8 @@ are: Socket, Sys, RE, OS, Random, Binascii & Pillow
 
 - Since the client requests a txt file, the browser assumes that the response will be a txt file. Now the response from our server does contain “Content-type: Image/PNG” to tell the browser of correct MIME type. But still the earlier assumption causes a problem when the client tries to save the encoded image:
 
-As it can be seen, the client must manually specify the file type every time he tries
-to save the encoded image. This is bad from a usability point of view.
+![alt text](readme_2.jpg "readme_2")
+
+- As it can be seen, the client must manually specify the file type every time he tries to save the encoded image. This is bad from a usability point of view.
 
 - One work-around for the problem would be to redirect the client from localhost:55555/file1.txt to localhost:55555/file1.png via HTTP headers and then serve the client with the encoded image.
