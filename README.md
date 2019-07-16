@@ -1,9 +1,8 @@
-# Mini Project - 
+# Mini Project - Image Steganography using a custom web-server
 
-Worked on encoding and decoding text files in images and consequently setting up an HTTP based client server application.
+## Brief Description
 
-
-
+This mini-project is my implementation of a secure HTTP based client server application which seamlessly works on encoding and decoding text files in images. This project is written in Python 3.5.
 
 
 ## Instructions for Encoding
@@ -18,17 +17,17 @@ Worked on encoding and decoding text files in images and consequently setting up
 ## Instructions for Decoding
 
 1. Copy the encoded image to the project root
-2. Open Decoder.py and set the variable imageName to the name of the encoded image file.
+2. Open Decoder.py and set the variable imageName to the name of the encoded image file
 3. Run the script and you'll see the decoded text
 
 ## Project Status
 
-1. Server sends appropriate HTTP response messages
-2. Server is able to encode any text file (from the 10 available) into an image (randomly chosen from the 5 24-bit PNGs available)
-3. Server is able to serve the client with the encoded image
-4. Client is able to open the image into any image editing software
-5. There are no visual differences between the encoded image and the original image
-6. An independent script is provided for anyone to decode the encoded image
+- Server sends appropriate HTTP response messages
+- Server is able to encode any text file (from the 10 available) into an image (randomly chosen from the 5 24-bit PNGs available)
+- Server is able to serve the client with the encoded image
+- Client is able to open the image into any image editing software
+- There are no visual differences between the encoded image and the original image
+- An independent script is provided for anyone to decode the encoded image
 
 ## Project Performance
 
@@ -42,5 +41,13 @@ Worked on encoding and decoding text files in images and consequently setting up
 ## Project Dependencies
 
 The project has been built using Python 3.5. Other external libraries used in the project
-are: Socket, Sys, RE, OS, Random, Binascii & Pillow.
+are: Socket, Sys, RE, OS, Random, Binascii & Pillow
 
+## Project Limitations
+
+- Since the client requests a txt file, the browser assumes that the response will be a txt file. Now the response from our server does contain “Content-type: Image/PNG” to tell the browser of correct MIME type. But still the earlier assumption causes a problem when the client tries to save the encoded image:
+
+As it can be seen, the client must manually specify the file type every time he tries
+to save the encoded image. This is bad from a usability point of view.
+
+- One work-around for the problem would be to redirect the client from localhost:55555/file1.txt to localhost:55555/file1.png via HTTP headers and then serve the client with the encoded image.
