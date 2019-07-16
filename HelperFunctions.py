@@ -1,4 +1,5 @@
-#awesome functions to set or clear the LSB using bit manipulations
+# functions to set or clear the LSB using bit manipulations
+
 def set_last_bit(num):
     return num | 1
 
