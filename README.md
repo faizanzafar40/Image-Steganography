@@ -1,4 +1,4 @@
-# Mini Project - Image Steganography using a custom web-server
+# Image Steganography using a Custom Web Server
 
 ## Brief Description
 
