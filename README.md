@@ -1,57 +1,142 @@
-# Image Steganography using a Custom Web Server
+# Image Steganography over a Custom Web Server
 
-## Brief Description
+Hide a text file inside an ordinary-looking PNG, serve it from a web server I
+wrote from scratch on raw sockets, and pull the message back out with a small
+decoder.
 
-This mini-project is my implementation of a secure HTTP based client server application which seamlessly works on encoding and decoding text files in images. The project is written in Python 3.5.
+I built this to really understand two things at once: least-significant-bit
+(LSB) steganography, and what an HTTP server actually does once you strip away
+the framework. A client requests `/fileN.txt`; instead of the text, it gets a
+PNG with that text invisibly woven into the pixels. To the eye the image is
+unchanged — every colour value moves by at most 1.
 
+## How it works
 
-## Instructions for Encoding
+The message is turned into a stream of bits and written one bit at a time into
+the least significant bit of each red, green, and blue channel — so three
+pixels carry roughly one byte of data. A short marker (a `1` followed by a long
+run of zeros) is appended so the decoder knows exactly where the message ends.
+Decoding just reads those LSBs back in the same order until it sees the marker.
 
-1. Run MyServer.py
-2. Go to localhost:55555 and you'll get a 400 Bad Request response since this request is not programmed to do anything as per the API
-3. Go to localhost:55555/file1.txt to recieve the contents of file1 encoded into a random image from the 5 present in the project directory
-4. Save the encoded image file. Make sure to select right file type (i.e. png) while saving
-5. You can fetch any of the ten files (from file1.txt to file10.txt). But fetching a file that is not present in the directory (i.e. file50 for example) will result in a 404 Not Found response
+## Tech stack
 
+- **Python 3.9+**
+- **[Pillow](https://python-pillow.org/)** for reading and writing PNG pixels
+- The standard library `socket`, `re`, and `os` modules for the hand-rolled
+  HTTP server — no web framework
 
-## Instructions for Decoding
+## Features
 
-1. Copy the encoded image to the project root
-2. Open Decoder.py and set the variable imageName to the name of the encoded image file
-3. Run the script and you'll see the decoded text
+- Encodes any of the bundled text files into a randomly chosen 24-bit PNG
+- Serves the encoded image over HTTP with the correct `image/png` MIME type
+- Returns proper `400 Bad Request` and `404 Not Found` responses for bad or
+  unknown requests
+- Ships a standalone decoder so anyone can recover the message from an image
+- Leaves no visible trace in the carrier image
 
-## Project Status
+## Project structure
 
-- Server sends appropriate HTTP response messages as manually verified by a chrome extension:
+```
+.
+├── src/steganography/
+│   ├── bits.py        # LSB get/set + text <-> bits conversion
+│   ├── encoder.py     # embed text into a carrier PNG
+│   ├── decoder.py     # recover text from an encoded PNG (also a CLI)
+│   └── server.py      # socket HTTP server that encodes on request
+├── assets/carriers/   # 1.png .. 5.png, the 24-bit carrier images
+├── samples/           # file1.txt .. file10.txt, sample payloads
+├── tests/             # round-trip and server tests
+└── docs/images/       # screenshots used in this README
+```
 
-![alt text](https://github.com/faizanzafar40/Mini-Project-Image-Steganography-using-a-Custom-Web-server/blob/master/readme_1.JPG "readme_1")
+## Getting started
 
-- Server is able to encode any text file (from the 10 available) into an image (randomly chosen from the 5 24-bit PNGs available)
-- Server is able to serve the client with the encoded image
-- Client is able to open the image into any image editing software
-- There are no visual differences between the encoded image and the original image
-- An independent script is provided for anyone to decode the encoded image
+I recommend a virtual environment, then an editable install so the
+`steg-server` and `steg-decode` commands are available:
 
-## Project Performance
+```bash
+python -m venv .venv
+source .venv/bin/activate        # on Windows: .venv\Scripts\activate
+pip install -e .
+```
 
-- In one benchmarking test, encoding a complete book of 492KB into an image of 3.2MB took around 7 seconds and the decoding took around 6 seconds.
-- It has been ensured that the algorithm is able to encode all ASCII characters. And during testing, various text files of various sizes have been encoded into several distinct images to ensure a bug free program.
-- To improve the algorithm's performance, bit hacks have been employed in all three cases of fetching/setting/clearing the LSB of a byte.
-- It has been ensured that every byte of an image is encoded with one bit of data. So, three pixels of an image are being used for encoding one byte of data.
-- A regular expression is used for fetching the number of file requested by client
-- The binary of text to be encoded is terminated with bits 10000000000… so the decoder knows when to stop. It has been ensured that this technique works well. In fact, a sequence like 000000000000… would’ve caused severe bugs in the program. But we’ve started our sequence with a 1 and have then proceeded it with several dozen zeros.
+Prefer not to install anything? Just add the package to the path:
 
-## Project Dependencies
+```bash
+pip install -r requirements.txt
+export PYTHONPATH=src            # on Windows: set PYTHONPATH=src
+```
 
-The project has been built using Python 3.5. Other external libraries used in the project
-are: Socket, Sys, RE, OS, Random, Binascii & Pillow
+## Running it
 
-## Project Limitations
+### Encoding (the server)
 
-- Since the client requests a txt file, the browser assumes that the response will be a txt file. Now the response from our server does contain “Content-type: Image/PNG” to tell the browser of correct MIME type. But still the earlier assumption causes a problem when the client tries to save the encoded image:
+```bash
+steg-server                      # or: python -m steganography.server
+```
 
-![alt text](https://github.com/faizanzafar40/Mini-Project-Image-Steganography-using-a-Custom-Web-server/blob/master/readme_2.JPG "readme_2")
+Then:
 
-- As it can be seen, the client must manually specify the file type every time he tries to save the encoded image. This is bad from a usability point of view.
+1. Visit <http://localhost:55555> — you'll get a `400 Bad Request`, because the
+   bare path isn't something the API knows how to answer.
+2. Visit <http://localhost:55555/file1.txt> to receive the contents of
+   `file1.txt` encoded into a random carrier image.
+3. Save the response. Make sure you save it as a `.png`.
+4. Any file from `file1.txt` to `file10.txt` works; anything else (say
+   `file50.txt`) returns `404 Not Found`.
 
-- One work-around for the problem would be to redirect the client from localhost:55555/file1.txt to localhost:55555/file1.png via HTTP headers and then serve the client with the encoded image.
+### Decoding
+
+```bash
+steg-decode path/to/encoded.png  # or: python -m steganography.decoder <image>
+```
+
+It prints the recovered text to stdout.
+
+## Running the tests
+
+```bash
+pip install pytest
+pytest
+```
+
+The suite round-trips every sample file through encode → decode and checks the
+server's `400`/`404`/`200` responses.
+
+## Screenshots
+
+The server returns the right HTTP status for each kind of request:
+
+![Server HTTP responses](docs/images/readme_1.jpg)
+
+Because the client asked for a `.txt`, the browser still wants to save the
+result as text, so I have to pick the `.png` type by hand when saving:
+
+![Saving the encoded image](docs/images/readme_2.jpg)
+
+## Notes and limitations
+
+- A few details I'm happy with: I use bit hacks to set/clear the LSB, pack one
+  bit into every channel, and use a regular expression to pull the requested
+  file number out of the raw HTTP request. In a quick benchmark, hiding a
+  ~492 KB book in a 3.2 MB image took about 7 seconds to encode and 6 to
+  decode, and the encoder handles the full range of ASCII characters.
+- Because the client requested a `.txt`, the browser assumes the response is
+  text. The response does say `Content-type: image/png`, but the browser still
+  nudges you to save it as text — so you have to choose the PNG type manually.
+  A natural fix would be to redirect `/file1.txt` to `/file1.png` over HTTP
+  headers before serving the image.
+- The server is a deliberately minimal teaching implementation: single
+  connection at a time, no TLS, and it reads only the first 4 KB of each
+  request.
+
+## What I learned
+
+This was where HTTP stopped being magic for me — once you've written the status
+line and headers by hand, the protocol is just text over a socket. It was also
+a satisfying first encounter with the idea that you can hide information in
+plain sight without anyone being able to tell.
+
+## License
+
+Released under the [MIT License](LICENSE).
