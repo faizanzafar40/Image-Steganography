@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "image-steganography"
+version = "1.0.0"
+description = "Hide text files inside PNG images with LSB steganography, served over a hand-rolled HTTP server."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Faizan Zafar" }]
+keywords = ["steganography", "lsb", "pillow", "sockets", "http"]
+dependencies = ["Pillow>=12.0,<13.0"]
+
+[project.scripts]
+steg-server = "steganography.server:main"
+steg-decode = "steganography.decoder:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/steganography"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
