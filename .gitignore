@@ -1,0 +1,27 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Build and distribution artifacts
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Encoded output produced at runtime
+*modified.png
+
+# Tooling caches
+.ruff_cache/
+.pytest_cache/
+
+# Editor / OS cruft
+.vs/
+.vscode/
+.idea/
+.DS_Store
